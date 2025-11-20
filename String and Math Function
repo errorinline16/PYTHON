@@ -1,0 +1,14 @@
+text = "hello world"
+print(text.upper())
+print(text.capitalize())
+print(text.replace("world", "Python"))
+print(len(text))
+
+import math
+
+num = 25
+print(math.sqrt(num))
+print(math.pow(2, 3))
+print(abs(-15))
+print(max(10, 20, 5))
+print(min(10, 20, 5))

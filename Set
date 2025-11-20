@@ -1,0 +1,12 @@
+fruits = {"apple", "banana", "orange", "apple"}
+
+print("Set items:")
+for item in fruits:
+    print(item)
+
+fruits.add("mango")
+fruits.remove("banana")
+
+print("\nUpdated set:")
+for item in fruits:
+    print(item)

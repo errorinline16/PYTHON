@@ -1,0 +1,240 @@
+import customtkinter as ctk
+import tkinter as tk
+from tkinter import messagebox, ttk
+
+# ==========================
+# APP SETTINGS
+# ==========================
+ctk.set_appearance_mode("light")
+ctk.set_default_color_theme("blue")
+
+users = {}  # store users temporarily
+
+
+# ==========================
+# REGISTRATION PAGE
+# ==========================
+def register_page():
+    reg = ctk.CTk()
+    reg.title("Sign Up")
+    reg.geometry("420x560")
+    reg.resizable(False, False)
+
+    # === GRADIENT BACKGROUND ===
+    gradient = ctk.CTkCanvas(reg, highlightthickness=0)
+    gradient.pack(fill="both", expand=True)
+
+    def draw_gradient(event=None):
+        gradient.delete("all")
+        width = reg.winfo_width()
+        height = reg.winfo_height()
+        for i in range(height):
+            r = 255
+            g = int(100 - (i / height) * 80)
+            b = int(180 + (i / height) * 60)
+            color = f"#{r:02x}{max(0, g):02x}{min(255, b):02x}"
+            gradient.create_line(0, i, width, i, fill=color)
+
+    gradient.bind("<Configure>", draw_gradient)
+
+    frame = ctk.CTkFrame(reg, width=330, height=420, corner_radius=15, fg_color="white")
+    frame.place(relx=0.5, rely=0.5, anchor="center")
+
+    ctk.CTkLabel(frame, text="Create Account", text_color="#333", font=("Poppins SemiBold", 22)).pack(pady=(20, 10))
+
+    username = ctk.CTkEntry(frame, placeholder_text="Email Address", width=250, height=40)
+    username.pack(pady=10)
+    password = ctk.CTkEntry(frame, placeholder_text="Password (max 8 chars)", show="*", width=250, height=40)
+    password.pack(pady=10)
+    confirm = ctk.CTkEntry(frame, placeholder_text="Confirm Password", show="*", width=250, height=40)
+    confirm.pack(pady=10)
+
+    def register_action():
+        u = username.get()
+        p = password.get()
+        c = confirm.get()
+
+        if not u or not p:
+            messagebox.showwarning("Incomplete", "Please fill all fields")
+        elif len(p) > 8:
+            messagebox.showwarning("Too Long", "Password must be at most 8 characters")
+        elif p != c:
+            messagebox.showerror("Error", "Passwords do not match")
+        elif u in users:
+            messagebox.showerror("Error", "Account already exists")
+        else:
+            users[u] = p
+            messagebox.showinfo("Success", "Account created successfully!")
+            reg.destroy()
+            login_page()
+
+    ctk.CTkButton(frame, text="Register", width=220, height=38, fg_color="#FF4E9A",
+                  hover_color="#C33EFF", command=register_action).pack(pady=15)
+    ctk.CTkButton(frame, text="Back to Login", width=220, height=38, fg_color="#C33EFF",
+                  hover_color="#FF4E9A", command=lambda: [reg.destroy(), login_page()]).pack(pady=(0, 10))
+
+    reg.mainloop()
+
+
+# ==========================
+# PERSONAL INFORMATION FORM
+# ==========================
+def personal_info_form():
+    window = tk.Tk()
+    window.title("Personal Information Form")
+    window.geometry("420x540")
+    window.config(bg="#FFC1E3")  # soft pink background
+
+    # ---------- FUNCTIONS ----------
+    def submit_form():
+        name = entry_name.get()
+        age = entry_age.get()
+        gender = gender_var.get()
+        country = country_cb.get()
+        comment = text_comment.get("1.0", "end-1c")
+        custom_hobby = entry_custom_hobby.get()
+
+        hobbies = []
+        if hobby_reading.get():
+            hobbies.append("Reading")
+        if hobby_sports.get():
+            hobbies.append("Sports")
+        if hobby_music.get():
+            hobbies.append("Music")
+        if custom_hobby.strip() != "":
+            hobbies.append(custom_hobby.strip())
+
+        if name == "" or age == "" or gender == "" or country == "":
+            messagebox.showwarning("Incomplete Data", "Please fill out all required fields!")
+        else:
+            info = (
+                f"Name: {name}\n"
+                f"Age: {age}\n"
+                f"Gender: {gender}\n"
+                f"Hobbies: {', '.join(hobbies)}\n"
+                f"Country: {country}\n"
+                f"Comment: {comment}"
+            )
+            messagebox.showinfo("Form Submitted", info)
+
+    # ---------- UI ----------
+    title_label = tk.Label(
+        window,
+        text="Personal Information Form",
+        font=("Poppins SemiBold", 16),
+        bg="#FF4E9A",
+        fg="#4A0072",  # deep purple
+    )
+    title_label.pack(pady=10)
+
+    frame = tk.Frame(window, bg="#FFE6F3")  # light pink panel
+    frame.pack(pady=10, padx=10, fill="both")
+
+    # Labels and entries
+    tk.Label(frame, text="Full Name:", bg="#FFE6F3", fg="#4A0072", font=("Poppins", 12)).grid(row=0, column=0, sticky="w", pady=3)
+    entry_name = tk.Entry(frame, width=30)
+    entry_name.grid(row=0, column=1, pady=3)
+
+    tk.Label(frame, text="Age:", bg="#FFE6F3", fg="#4A0072", font=("Poppins", 12)).grid(row=1, column=0, sticky="w", pady=3)
+    entry_age = tk.Entry(frame, width=30)
+    entry_age.grid(row=1, column=1, pady=3)
+
+    tk.Label(frame, text="Gender:", bg="#FFE6F3", fg="#4A0072", font=("Poppins", 12)).grid(row=2, column=0, sticky="w")
+    gender_var = tk.StringVar()
+    tk.Radiobutton(frame, text="Male", variable=gender_var, value="Male", bg="#FFE6F3", fg="#4A0072", selectcolor="#FFB6C1").grid(row=2, column=1, sticky="w")
+    tk.Radiobutton(frame, text="Female", variable=gender_var, value="Female", bg="#FFE6F3", fg="#4A0072", selectcolor="#FFB6C1").grid(row=2, column=1, sticky="e")
+
+    # Hobbies
+    tk.Label(frame, text="Hobbies:", bg="#FFE6F3", fg="#4A0072", font=("Poppins", 12)).grid(row=3, column=0, sticky="w")
+    hobby_reading = tk.BooleanVar()
+    hobby_sports = tk.BooleanVar()
+    hobby_music = tk.BooleanVar()
+    tk.Checkbutton(frame, text="Reading", variable=hobby_reading, bg="#FFE6F3", fg="#4A0072", selectcolor="#FFCCE5").grid(row=3, column=1, sticky="w")
+    tk.Checkbutton(frame, text="Sports", variable=hobby_sports, bg="#FFE6F3", fg="#4A0072", selectcolor="#FFCCE5").grid(row=4, column=1, sticky="w")
+    tk.Checkbutton(frame, text="Music", variable=hobby_music, bg="#FFE6F3", fg="#4A0072", selectcolor="#FFCCE5").grid(row=5, column=1, sticky="w")
+
+    # Custom hobby input
+    tk.Label(frame, text="Other hobby:", bg="#FFE6F3", fg="#4A0072", font=("Poppins", 12)).grid(row=6, column=0, sticky="w")
+    entry_custom_hobby = tk.Entry(frame, width=30)
+    entry_custom_hobby.grid(row=6, column=1, pady=3)
+
+    # Country dropdown
+    tk.Label(frame, text="Country:", bg="#FFE6F3", fg="#4A0072", font=("Poppins", 12)).grid(row=7, column=0, sticky="w")
+    country_cb = ttk.Combobox(frame, values=["Philippines", "Japan", "USA", "Canada", "Australia"], width=27)
+    country_cb.grid(row=7, column=1, pady=5)
+
+    # Comments
+    tk.Label(window, text="Comments:", bg="#FFC1E3", fg="#4A0072", font=("Poppins", 12)).pack(pady=5)
+    text_comment = tk.Text(window, width=35, height=4, bg="#FFF0F7", fg="#4A0072", relief="flat", highlightbackground="#FF99CC")
+    text_comment.pack()
+
+    # Buttons
+    tk.Button(window, text="Submit", command=submit_form, bg="#FF4E9A", fg="white", font=("Poppins SemiBold", 12), width=10, relief="flat").pack(pady=10)
+    tk.Button(window, text="Exit", command=window.destroy, bg="#A020F0", fg="white", font=("Poppins SemiBold", 12), width=10, relief="flat").pack()
+
+    window.mainloop()
+
+
+# ==========================
+# LOGIN PAGE
+# ==========================
+def login_page():
+    app = ctk.CTk()
+    app.title("Login Page")
+    app.geometry("420x520")
+    app.resizable(False, False)
+
+    # === GRADIENT BACKGROUND ===
+    gradient = ctk.CTkCanvas(app, highlightthickness=0)
+    gradient.pack(fill="both", expand=True)
+
+    def draw_gradient(event=None):
+        gradient.delete("all")
+        width = app.winfo_width()
+        height = app.winfo_height()
+        for i in range(height):
+            r = 255
+            g = int(120 - (i / height) * 100)
+            b = int(180 + (i / height) * 75)
+            color = f"#{r:02x}{max(0, g):02x}{min(255, b):02x}"
+            gradient.create_line(0, i, width, i, fill=color)
+
+    gradient.bind("<Configure>", draw_gradient)
+
+    frame = ctk.CTkFrame(app, width=330, height=380, corner_radius=15, fg_color="white")
+    frame.place(relx=0.5, rely=0.5, anchor="center")
+
+    ctk.CTkLabel(frame, text="Login Form", text_color="#333", font=("Poppins SemiBold", 22)).pack(pady=(20, 10))
+
+    username = ctk.CTkEntry(frame, placeholder_text="Email Address", width=250, height=40)
+    username.pack(pady=10)
+    password = ctk.CTkEntry(frame, placeholder_text="Password", show="*", width=250, height=40)
+    password.pack(pady=10)
+
+    def login_action():
+        u = username.get()
+        p = password.get()
+        if u in users and users[u] == p:
+            messagebox.showinfo("Login Successful", f"Welcome, {u}!")
+            app.destroy()
+            personal_info_form()
+        else:
+            messagebox.showerror("Login Failed", "Invalid email or password")
+
+    def open_register():
+        app.destroy()
+        register_page()
+
+    ctk.CTkButton(frame, text="Login", width=220, height=38, fg_color="#FF4E9A",
+                  hover_color="#C33EFF", command=login_action).pack(pady=15)
+    ctk.CTkButton(frame, text="Signup", width=220, height=38, fg_color="#C33EFF",
+                  hover_color="#FF4E9A", command=open_register).pack(pady=(0, 10))
+
+    app.mainloop()
+
+
+# ==========================
+# RUN APP
+# ==========================
+if __name__ == "__main__":
+    login_page()
